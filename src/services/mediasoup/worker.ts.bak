@@ -20,27 +20,6 @@ class MediasoupWorkerManager {
       });
 
       this.workers.push(worker);
-      if (process.env.MEDIASOUP_USE_WEBRTC_SERVER !== 'false') {
-        // Each mediasoup Worker will run its own WebRtcServer, so those cannot
-        // share the same listening ports. Hence we increase the value in config.js
-        // for each Worker.
-        //const webRtcServerOptions = utils.clone(config.mediasoup.webRtcServerOptions);
-        try {
-            //console.log("process.env.WEBRTCSERVEROPTIONS:"+ process.env.WEBRTCSERVEROPTIONS);
-            const webRtcServerOptions:any = JSON.parse(process.env.WEBRTCSERVEROPTIONS as string);
-            const portIncrement = this.workers.length - 1;
-
-            for (const listenInfo of webRtcServerOptions.listenInfos ) {
-                listenInfo.port += portIncrement;
-            }
-
-            const webRtcServer = await worker.createWebRtcServer(webRtcServerOptions);
-
-            worker.appData.webRtcServer = webRtcServer;
-          }catch(err) {
-            console.log("create webrtc server get a error:",err);
-          }
-      }
     }
   }
 

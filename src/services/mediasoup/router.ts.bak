@@ -4,7 +4,6 @@ import { ServiceError } from '../base.js';
 
 class MediasoupRouterManager {
   static routers = new Map<string, types.Router>();
-  static workers = new Map<string, types.Worker>();
 
   async create(data: { pid: number }) {
     const worker = mediasoupWorkerManager.get(data.pid);
@@ -59,7 +58,6 @@ class MediasoupRouterManager {
     ];
     const router = await worker.createRouter({ mediaCodecs });
     MediasoupRouterManager.routers.set(router.id, router);
-    MediasoupRouterManager.workers.set(router.id, worker);//add for single webrtc port
     return {
       id: router.id,
       rtpCapabilities: router.rtpCapabilities,
@@ -83,14 +81,6 @@ class MediasoupRouterManager {
       return router;
     }
     throw new ServiceError(404, 'Router not found');
-  }
-  //get single webrtc port
-  getWorker(id: string) {
-    const worker = MediasoupRouterManager.workers.get(id);
-    if (worker) {
-      return worker;
-    }
-    throw new ServiceError(404, 'Worker not found');
   }
 
   async delete(id: string) {

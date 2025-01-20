@@ -35,7 +35,6 @@ class MediasoupProducerWebRTCTransportManager extends MediasoupWebRTCTransportMa
 
   async create(data: { routerId: string }) {
     const router = mediasoupRouterManager.get(data.routerId);
-    const worker = mediasoupRouterManager.getWorker(data.routerId); //add for single webrtc port
     const maxIncomingBitrate =
       Number(process.env.MEDIASOUP_WEBRTC_TRANSPORT_MAX_INCOMING_BITRATE) ||
       1500000;
@@ -48,25 +47,13 @@ class MediasoupProducerWebRTCTransportManager extends MediasoupWebRTCTransportMa
       process.env.MEDIASOUP_WEBRTC_TRANSPORT_LISTEN_IPS || '[]'
     );
 
-    const webRtcServerOptions:any = JSON.parse(process.env.WEBRTCSERVEROPTIONS as string);
-    const webrtcServer = worker.appData.webRtcServer;
     const transport = await router.createWebRtcTransport({
-      //listenIps: listenIps,
-      ...webRtcServerOptions,
+      listenIps: listenIps,
       enableUdp: true,
       enableTcp: true,
       preferUdp: true,
-      webRtcServer: webrtcServer,
       initialAvailableOutgoingBitrate,
     });
-
-    // const transport = await router.createWebRtcTransport({
-    //   listenIps: listenIps,
-    //   enableUdp: true,
-    //   enableTcp: true,
-    //   preferUdp: true,
-    //   initialAvailableOutgoingBitrate,
-    // });
     if (maxIncomingBitrate) {
       try {
         await transport.setMaxIncomingBitrate(maxIncomingBitrate);
